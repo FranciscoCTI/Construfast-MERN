@@ -1,4 +1,4 @@
-Hello, wellcome to ConstruFast codebase. ConstruFast will be a new service for connecting all the stakeholders on house construction, specifically aiming at cheap housing. This is just the start. The project is very ambitious, so keep in contact if you want to see more soon.
+Hello, wellcome to ConstruFast codebase. ConstruFast will be a new service for connecting all the stakeholders on house construction, specifically aiming at cheap housing. This is just the start. The project is very ambitious, we will implement map localization, construction projects with 3d visualization, the posibility to trade materials and more. So keep in contact if you want to see more soon.
 
 <ul>
   <li>www.constru-fast.com</li>
