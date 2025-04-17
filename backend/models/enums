@@ -1,0 +1,11 @@
+export const disciplines = {
+    PAINTING: "painting",
+    FURNITURE: "furniture",
+    PLUMBING: "plumbing",
+    METAL_STRUCTURES: "metal_structures",
+    CARPINTERY: "carpintery",
+    MASONRY: "masonry",
+    GARDENING: "gardening",
+    ELECTRICAL: "electrical",
+    HVAC: "hvac"
+};

@@ -1,9 +1,9 @@
 import express from 'express';
 import { connectDB } from './config/db.js';
-//import Product from './models/product.model.js';
+import ServiceProvider from './models/serviceProvider.model.js';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-//import productRoutes from './routes/product.routes.js';
+import serviceProvidersRoutes from './routes/serviceProvidersRoutes.js';
 import cors from 'cors';
 import path from 'path';
 
@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.use(cors());
 
-//app.use('/', serviceProvidersRoutes);
+app.use('/', serviceProvidersRoutes);
 
 /*
 if (process.env.NODE_ENV === "production") {
