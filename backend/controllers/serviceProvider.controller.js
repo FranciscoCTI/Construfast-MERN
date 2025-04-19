@@ -51,3 +51,22 @@ export const removeServiceProvider = async (req, res) => {
         res.status(500).send("Something went wrong");
     }
 };
+
+export const replaceServiceProvider = async (req, res) => {
+    const { id } = req.params;
+    const serviceProv = req.body;
+
+    console.log('process of replacing');
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ success: false, message: 'Invalid service provider id' });
+    }
+
+    try {
+        const updatedServiceProvider = await ServiceProvider.findByIdAndUpdate(id, serviceProv, { new: true });
+        res.status(201).json({ success: true, data: updatedServiceProvider, message: 'Service provider updated succesfully' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}

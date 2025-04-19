@@ -3,7 +3,7 @@ export const disciplines = {
     FURNITURE: "furniture",
     PLUMBING: "plumbing",
     METAL_STRUCTURES: "metal_structures",
-    CARPINTERY: "carpintery",
+    CARPINTERY: "carpentry",
     MASONRY: "masonry",
     GARDENING: "gardening",
     ELECTRICAL: "electrical",
