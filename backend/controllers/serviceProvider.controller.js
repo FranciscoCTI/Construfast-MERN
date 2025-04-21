@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 export const getServiceProviders = async (req, res) => {
     try {
         const serviceProv = await ServiceProvider.find({});
-        return res.status(201).json({
+        return res.status(200).json({
             count: serviceProv.length,
             datum: serviceProv
         });

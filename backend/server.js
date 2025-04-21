@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.use(cors());
 
-app.use('/', serviceProvidersRoutes);
+app.use('/api/serviceProviders', serviceProvidersRoutes);
 
 /*
 if (process.env.NODE_ENV === "production") {
