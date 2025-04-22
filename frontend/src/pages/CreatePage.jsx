@@ -1,7 +1,13 @@
 import { React, useState } from 'react'
-import { Box, Button, Container, Heading, useColorModeValue, VStack, Input, HStack, Stack, useToast } from '@chakra-ui/react';
+import {
+    Box, Button, Container,
+    Heading, useColorModeValue, VStack,
+    Input, HStack, Stack,
+    useToast, Select, Wrap, Text
+} from '@chakra-ui/react';
 import { useServiceProviderStore } from '../store/serviceProvider';
 import { CiTrophy } from 'react-icons/ci';
+import { disciplines } from '../../../backend/models/enums';
 
 export const CreatePage = () => {
     const [newServiceProvider, setNewServiceProvider] = useState({
@@ -14,6 +20,8 @@ export const CreatePage = () => {
 
     const toast = useToast();
     const { createServiceProvider } = useServiceProviderStore();
+
+    const [selectedDiscipline, setSelectedDiscipline] = useState('');
 
     const handleAddServiceProvider = async () => {
         const { success, message } = await createServiceProvider(newServiceProvider);
@@ -44,6 +52,28 @@ export const CreatePage = () => {
         })
     };
 
+    const handleAddDiscipline = async () => {
+        if (!selectedDiscipline || newServiceProvider.disciplines.includes(selectedDiscipline)) {
+            return;
+        }
+
+        const updatedDisciplines = [...newServiceProvider.disciplines, selectedDiscipline];
+        const updatedServiceProvider = { ...newServiceProvider, disciplines: updatedDisciplines };
+
+        setNewServiceProvider(updatedServiceProvider);
+        setSelectedDiscipline('');
+    };
+
+    const handleRemoveDiscipline = async (dicToRemove) => {
+        const updatedDisciplines = newServiceProvider.disciplines.filter(
+            (s) => s != dicToRemove
+        );
+
+        const updatedServiceProvider = { ...newServiceProvider, disciplines: updatedDisciplines };
+
+        setNewServiceProvider(updatedServiceProvider);
+    };
+
     return (
         <Container maxW={"container.sm"}>
             <VStack spacing={8}>
@@ -71,6 +101,46 @@ export const CreatePage = () => {
                             value={newServiceProvider.city}
                             onChange={(e) => setNewServiceProvider({ ...newServiceProvider, city: e.target.value })}
                         />
+                        <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>
+                            <VStack align={'center'} spacing={5}>
+                                <Text align={'left'} ><b>Disciplines</b></Text>
+                                <Wrap mb={10}>
+                                    {
+                                        newServiceProvider.disciplines.map((discipline, idDic) => (
+                                            <Box p={2} bg='blue.100' borderRadius='sm' key={idDic}>
+                                                <HStack>
+                                                    <Box mr={2}>
+                                                        {discipline}
+                                                    </Box>
+                                                    <Button
+                                                        size="xs"
+                                                        colorScheme="red"
+                                                        onClick={() => handleRemoveDiscipline(discipline)}>
+                                                        X
+                                                    </Button>
+                                                </HStack>
+                                            </Box>
+                                        ))
+                                    }
+                                </Wrap>
+                                <HStack spacing={4}>
+                                    <Select
+                                        placeholder="Select discipline"
+                                        value={selectedDiscipline}
+                                        onChange={(e) => setSelectedDiscipline(e.target.value)}
+                                    >
+                                        {Object.values(disciplines).map((disc) => (
+                                            <option key={disc} value={disc}>
+                                                {disc.charAt(0).toUpperCase() + disc.slice(1).replace('_', ' ')}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                    <Button colorScheme="blue" onClick={handleAddDiscipline}>
+                                        Add
+                                    </Button>
+                                </HStack>
+                            </VStack>
+                        </Box>
                         <Input placeholder='Image'
                             name='name'
                             value={newServiceProvider.image}

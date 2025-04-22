@@ -4,10 +4,12 @@ import {
     IconButton, Text, useColorModeValue, Image,
     useToast, Modal, useDisclosure, ModalOverlay,
     ModalContent, ModalHeader, ModalCloseButton,
-    ModalBody, Input, ModalFooter, Button
+    ModalBody, Input, ModalFooter, Button, Select, Wrap,
+    Stack
 } from '@chakra-ui/react';
 import { useServiceProviderStore } from '../store/serviceProvider';
 import { useState } from 'react';
+import { disciplines } from '../../../backend/models/enums';
 
 export const ServiceProviderCard = ({ serviceProvider }) => {
 
@@ -17,6 +19,8 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
     const { removeServiceProvider, editServiceProvider } = useServiceProviderStore();
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const [selectedDiscipline, setSelectedDiscipline] = useState('');
 
     const handleDeleteServiceProvider = async (id) => {
         const { success, message } = await removeServiceProvider(id)
@@ -63,6 +67,60 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
         }
     };
 
+    const handleRemoveDiscipline = async (dicToRemove) => {
+        const updatedDisciplines = serviceProvider.disciplines.filter(
+            (s) => s != dicToRemove
+        );
+
+        const updatedProvider = { ...serviceProvider, disciplines: updatedDisciplines };
+
+        setUpdatedServiceProvider(updatedProvider);
+
+        const res = await fetch(`/api/serviceProviders/${serviceProvider._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedProvider)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            useServiceProviderStore.getState().fetchServiceProviders();
+        } else {
+            console.error("Failed to update services", data.message);
+        }
+    };
+
+    const handleAddDiscipline = async () => {
+        if (!selectedDiscipline || serviceProvider.disciplines.includes(selectedDiscipline)) {
+            return;
+        }
+
+        const updatedDisciplines = [...serviceProvider.disciplines, selectedDiscipline];
+        const updatedServiceProvider = { ...serviceProvider, disciplines: updatedDisciplines };
+
+        setUpdatedServiceProvider(updatedServiceProvider);
+        setSelectedDiscipline('');
+
+        const res = await fetch(`/api/serviceProviders/${serviceProvider._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedServiceProvider)
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            useServiceProviderStore.getState().fetchServiceProviders();
+        }
+        else {
+            console.error('Failed to add discipline', data.message);
+        }
+    };
+
     return (
         <Box shadow='lg'
             rounded='lg'
@@ -93,13 +151,6 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                         <Text fontSize='s' color={textColor} mb={0}>
                             {serviceProvider.city}
                         </Text>
-                    </HStack>
-                    <HStack>
-                        {serviceProvider.disciplines.map((di) => (
-                            <Box key={di.name} p={2} bg='blue.100' borderRadius='sm'>
-                                {di}
-                            </Box>
-                        ))}
                     </HStack>
                 </VStack>
 
@@ -137,6 +188,45 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                                 value={updatedServiceProvider.image}
                                 onChange={e => setUpdatedServiceProvider({ ...updatedServiceProvider, image: e.target.value })}
                             />
+                            {serviceProvider?.disciplines?.length > 0 ? (
+                                <Wrap>
+                                    {
+                                        serviceProvider.disciplines.map((discipline, idDic) => (
+                                            <Box p={2} bg='blue.100' borderRadius='sm' key={idDic}>
+                                                <HStack>
+                                                    <Box mr={2}>
+                                                        {discipline}
+                                                    </Box>
+                                                    <Button
+                                                        size="xs"
+                                                        colorScheme="red"
+                                                        onClick={() => handleRemoveDiscipline(discipline)}>
+                                                        X
+                                                    </Button>
+                                                </HStack>
+                                            </Box>
+                                        ))
+                                    }
+                                </Wrap>
+                            ) : (<Box>No disciplines listed</Box>)
+                            }
+
+                            <HStack>
+                                <Select
+                                    placeholder="Select discipline"
+                                    value={selectedDiscipline}
+                                    onChange={(e) => setSelectedDiscipline(e.target.value)}
+                                >
+                                    {Object.values(disciplines).map((disc) => (
+                                        <option key={disc} value={disc}>
+                                            {disc.charAt(0).toUpperCase() + disc.slice(1).replace('_', ' ')}
+                                        </option>
+                                    ))}
+                                </Select>
+                                <Button colorScheme="blue" onClick={handleAddDiscipline}>
+                                    Add
+                                </Button>
+                            </HStack>
                         </VStack>
                     </ModalBody>
                     <ModalFooter>
