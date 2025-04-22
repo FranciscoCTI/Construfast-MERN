@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { useServiceProviderStore } from '../store/serviceProvider';
 import { useState } from 'react';
-import { disciplines } from '../../../backend/models/enums';
+import { disciplines } from '../../../backend/models/enums.js';
 
 export const ServiceProviderCard = ({ serviceProvider }) => {
 

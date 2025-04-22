@@ -1,15 +1,29 @@
 import { VStack, Container, Text, SimpleGrid } from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react';
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useServiceProviderStore } from '../store/serviceProvider'
 import ServiceProviderCard from '../components/ServiceProviderCard'
+import FilterBar from '../components/FilterBar'
 
 export const HomePage = () => {
-    const { fetchServiceProviders, serviceProviders } = useServiceProviderStore();
+    const { fetchServiceProviders, serviceProviders, selectedDiscipline, selectedCity } = useServiceProviderStore();
 
     useEffect(() => { fetchServiceProviders() }, [fetchServiceProviders]);
 
     console.log('Service providers:', serviceProviders);
+
+    const filteredProviders = serviceProviders.filter((provider) => {
+        const matchesDiscipline = selectedDiscipline
+            ? provider.disciplines.includes(selectedDiscipline)
+            : true;
+
+        const matchesCity = selectedCity
+            ? provider.city?.toLowerCase() === selectedCity.toLowerCase()
+            : true;
+
+        return matchesDiscipline && matchesCity;
+    });
 
     return (
         <Container maxW='container.xl' py={12}>
@@ -24,6 +38,9 @@ export const HomePage = () => {
                     Current service providers
                 </Text>
 
+                <Box>
+                    <FilterBar />
+                </Box>
                 <SimpleGrid
                     columns={{
                         base: 1,
@@ -33,16 +50,15 @@ export const HomePage = () => {
                     spacing={10}
                     w={'full'}
                 >
-                    {serviceProviders.map((sp) => (
+                    {filteredProviders.map((sp) => (
 
                         (sp != null && sp.name != "" && sp.phone != 0 && sp.image != "") &&
                         (<ServiceProviderCard key={sp._id} serviceProvider={sp} />)
-
                     ))}
                 </SimpleGrid>
 
                 {
-                    serviceProviders.length === 0 &&
+                    filteredProviders.length === 0 &&
                     (
                         <Text fontSize='x1' textAlign={'center'} fontWeight={'bold'} color='gray.500'>
                             No service providers found :( {''}

@@ -3,7 +3,12 @@ import ServiceProvider from '../../../backend/models/serviceProvider.model';
 
 export const useServiceProviderStore = create((set) => ({
     serviceProviders: [],
+    selectedDiscipline: "",
+    selectedCity: "",
+    setDiscipline: (discipline) => set({ selectedDiscipline: discipline }),
+    setCity: (city) => set({ selectedCity: city }),
     setServiceProvider: (serviceProviders) => set({ serviceProviders }),
+
     fetchServiceProviders: async () => {
         const res = await fetch('/api/serviceProviders');
         console.log("📡 Response:", res);
