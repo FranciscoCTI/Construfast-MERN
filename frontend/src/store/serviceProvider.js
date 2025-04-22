@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import ServiceProvider from '../../../backend/models/serviceProvider.model';
 
 export const useServiceProviderStore = create((set) => ({
     serviceProviders: [],
@@ -29,5 +30,33 @@ export const useServiceProviderStore = create((set) => ({
         catch {
             return { success: false, message: "Error creating the serviceProvider" };
         }
+    },
+    removeServiceProvider: async (pid) => {
+        const res = await fetch(`/api/serviceProviders/${pid}`, { method: 'DELETE' });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            return { success: false, message: data.message };
+        }
+
+        set((state) => ({ serviceProviders: state.serviceProviders.filter((serviceProvider) => serviceProvider._id !== pid) }));
+        return { success: true, message: data.message };
+    },
+    editServiceProvider: async (pid, updatedSp) => {
+        const res = await fetch(`api/serviceProviders/${pid}`, {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedSp)
+        });
+
+        const data = await res.json();
+        if (!data.success) return { success: false, message: data.message };
+
+        set((state) => ({ serviceProviders: state.serviceProviders.map((serviceProvider) => (serviceProvider._id === pid ? data.data : serviceProvider)) }));
+        return { success: true, message: data.message };
+
     }
 }));
