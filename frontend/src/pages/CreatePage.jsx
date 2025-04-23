@@ -7,7 +7,8 @@ import {
 } from '@chakra-ui/react';
 import { useServiceProviderStore } from '../store/serviceProvider';
 import { CiTrophy } from 'react-icons/ci';
-import { disciplines } from '../../../backend/models/enums';
+import { cities, disciplines } from '../../../backend/models/enums';
+import ServiceProvider from '../../../backend/models/serviceProvider.model';
 
 export const CreatePage = () => {
     const [newServiceProvider, setNewServiceProvider] = useState({
@@ -20,8 +21,8 @@ export const CreatePage = () => {
 
     const toast = useToast();
     const { createServiceProvider } = useServiceProviderStore();
-
     const [selectedDiscipline, setSelectedDiscipline] = useState('');
+    const [selectedCity, setSelectedCity] = useState('');
 
     const handleAddServiceProvider = async () => {
         const { success, message } = await createServiceProvider(newServiceProvider);
@@ -74,6 +75,12 @@ export const CreatePage = () => {
         setNewServiceProvider(updatedServiceProvider);
     };
 
+    const handleLeaveCitySelection = async () => {
+        const updatedServiceProvider = { ...newServiceProvider, city: selectedCity };
+
+        setNewServiceProvider(updatedServiceProvider);
+    }
+
     return (
         <Container maxW={"container.sm"}>
             <VStack spacing={8}>
@@ -96,11 +103,25 @@ export const CreatePage = () => {
                             value={newServiceProvider.phone}
                             onChange={(e) => setNewServiceProvider({ ...newServiceProvider, phone: e.target.value })}
                         />
-                        <Input placeholder='City'
-                            name='name'
-                            value={newServiceProvider.city}
-                            onChange={(e) => setNewServiceProvider({ ...newServiceProvider, city: e.target.value })}
-                        />
+                        <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>
+                            <HStack align={'center'} spacing={5}>
+                                <Text align={'left'} ><b>City</b></Text>
+                                <HStack justify={'center'} spacing={4} width={'100%'}>
+                                    <Select
+                                        placeholder="Select city"
+                                        value={ServiceProvider.city}
+                                        onChange={(e) => setSelectedCity(e.target.value)}
+                                        onMouseLeave={handleLeaveCitySelection}
+                                    >
+                                        {Object.values(cities).map((disc) => (
+                                            <option key={disc} value={disc}>
+                                                {disc.charAt(0).toUpperCase() + disc.slice(1).replace('_', ' ')}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </HStack>
+                            </HStack>
+                        </Box>
                         <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>
                             <VStack align={'center'} spacing={5}>
                                 <Text align={'left'} ><b>Disciplines</b></Text>

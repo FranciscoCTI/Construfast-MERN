@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { useServiceProviderStore } from '../store/serviceProvider';
 import { useState } from 'react';
-import { disciplines } from '../../../backend/models/enums.js';
+import { disciplines, cities } from '../../../backend/models/enums.js';
 
 export const ServiceProviderCard = ({ serviceProvider }) => {
 
@@ -68,57 +68,36 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
     };
 
     const handleRemoveDiscipline = async (dicToRemove) => {
-        const updatedDisciplines = serviceProvider.disciplines.filter(
+        const updatedDisciplines = updatedServiceProvider.disciplines.filter(
             (s) => s != dicToRemove
         );
 
-        const updatedProvider = { ...serviceProvider, disciplines: updatedDisciplines };
+        const updatedProvider = { ...updatedServiceProvider, disciplines: updatedDisciplines };
 
         setUpdatedServiceProvider(updatedProvider);
-
-        const res = await fetch(`/api/serviceProviders/${serviceProvider._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedProvider)
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            useServiceProviderStore.getState().fetchServiceProviders();
-        } else {
-            console.error("Failed to update services", data.message);
-        }
     };
 
     const handleAddDiscipline = async () => {
-        if (!selectedDiscipline || serviceProvider.disciplines.includes(selectedDiscipline)) {
+        if (!selectedDiscipline ||
+            updatedServiceProvider.disciplines.includes(selectedDiscipline)) {
             return;
         }
 
-        const updatedDisciplines = [...serviceProvider.disciplines, selectedDiscipline];
-        const updatedServiceProvider = { ...serviceProvider, disciplines: updatedDisciplines };
+        const updatedDisciplines = [...(updatedServiceProvider.disciplines ?? []), selectedDiscipline];
+        const newServiceProvider = { ...updatedServiceProvider, disciplines: updatedDisciplines };
 
-        setUpdatedServiceProvider(updatedServiceProvider);
+        setUpdatedServiceProvider(newServiceProvider);
         setSelectedDiscipline('');
+    };
 
-        const res = await fetch(`/api/serviceProviders/${serviceProvider._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedServiceProvider)
-        });
+    const handleModalOpen = () => {
+        setUpdatedServiceProvider(serviceProvider);
+        onOpen();
+    };
 
-        const data = await res.json();
-        if (data.success) {
-            useServiceProviderStore.getState().fetchServiceProviders();
-        }
-        else {
-            console.error('Failed to add discipline', data.message);
-        }
+    const handleModalClose = () => {
+        setUpdatedServiceProvider(serviceProvider);
+        onClose();
     };
 
     return (
@@ -155,12 +134,12 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                 </VStack>
 
                 <HStack spacing={2} mt={5}>
-                    <IconButton icon={<EditIcon />} onClick={onOpen} colorScheme='blue' />
+                    <IconButton icon={<EditIcon />} onClick={handleModalOpen} colorScheme='blue' />
                     <IconButton icon={<DeleteIcon />} onClick={() => handleDeleteServiceProvider(serviceProvider._id)} colorScheme='red' />
                 </HStack>
             </Box>
 
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isOpen} onClose={handleModalClose}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Update service provider</ModalHeader>
@@ -178,20 +157,26 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                                 value={updatedServiceProvider.phone}
                                 onChange={e => setUpdatedServiceProvider({ ...updatedServiceProvider, phone: e.target.value })}
                             />
-                            <Input placeholder='City'
-                                name='name'
+                            <Select
+                                placeholder="Select city"
                                 value={updatedServiceProvider.city}
-                                onChange={e => setUpdatedServiceProvider({ ...updatedServiceProvider, city: e.target.value })}
-                            />
+                                onChange={(e) => setUpdatedServiceProvider({ ...updatedServiceProvider, city: e.target.value })}
+                            >
+                                {Object.values(cities).map((disc) => (
+                                    <option key={disc} value={disc}>
+                                        {disc.charAt(0).toUpperCase() + disc.slice(1).replace('_', ' ')}
+                                    </option>
+                                ))}
+                            </Select>
                             <Input placeholder='Image'
                                 name='name'
                                 value={updatedServiceProvider.image}
                                 onChange={e => setUpdatedServiceProvider({ ...updatedServiceProvider, image: e.target.value })}
                             />
-                            {serviceProvider?.disciplines?.length > 0 ? (
+                            {updatedServiceProvider?.disciplines?.length > 0 ? (
                                 <Wrap>
                                     {
-                                        serviceProvider.disciplines.map((discipline, idDic) => (
+                                        updatedServiceProvider.disciplines.map((discipline, idDic) => (
                                             <Box p={2} borderRadius='sm' key={idDic}>
                                                 <HStack>
                                                     <Box mr={2}>
