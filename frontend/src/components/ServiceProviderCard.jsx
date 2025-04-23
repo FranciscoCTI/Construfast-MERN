@@ -192,7 +192,7 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                                 <Wrap>
                                     {
                                         serviceProvider.disciplines.map((discipline, idDic) => (
-                                            <Box p={2} bg='blue.100' borderRadius='sm' key={idDic}>
+                                            <Box p={2} borderRadius='sm' key={idDic}>
                                                 <HStack>
                                                     <Box mr={2}>
                                                         {discipline}
