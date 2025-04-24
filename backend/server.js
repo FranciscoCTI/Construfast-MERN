@@ -4,6 +4,7 @@ import ServiceProvider from './models/serviceProvider.model.js';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import serviceProvidersRoutes from './routes/serviceProvidersRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 import cors from 'cors';
 import path from 'path';
 
@@ -21,6 +22,9 @@ app.use(cors());
 
 app.use('/api/serviceProviders', serviceProvidersRoutes);
 
+app.use('/api/serviceProviders', uploadRoutes);
+app.use('/uploads', express.static('uploads'));
+
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "/frontend/dist")));
     app.get(/(.*)/, (req, res) => {
@@ -28,7 +32,6 @@ if (process.env.NODE_ENV === "production") {
         res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
     })
 }
-
 
 app.listen(PORT, () => {
     connectDB();

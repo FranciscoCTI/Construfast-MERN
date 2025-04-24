@@ -9,6 +9,7 @@ import { useServiceProviderStore } from '../store/serviceProvider';
 import { CiTrophy } from 'react-icons/ci';
 import { cities, disciplines } from '../../../backend/models/enums';
 import ServiceProvider from '../../../backend/models/serviceProvider.model';
+import PictureUploader from '../components/PictureUploader.jsx';
 
 export const CreatePage = () => {
     const [newServiceProvider, setNewServiceProvider] = useState({
@@ -23,9 +24,19 @@ export const CreatePage = () => {
     const { createServiceProvider } = useServiceProviderStore();
     const [selectedDiscipline, setSelectedDiscipline] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
+    const [selectedImage, setSelectedImage] = useState('');
 
     const handleAddServiceProvider = async () => {
-        const { success, message } = await createServiceProvider(newServiceProvider);
+
+        if (!selectedImage) {
+            return;
+        }
+
+        const updatedServiceProvider = { ...newServiceProvider, image: selectedImage };
+
+        setNewServiceProvider(updatedServiceProvider);
+
+        const { success, message } = await createServiceProvider(updatedServiceProvider);
 
         if (!success) {
             toast({
@@ -79,7 +90,7 @@ export const CreatePage = () => {
         const updatedServiceProvider = { ...newServiceProvider, city: selectedCity };
 
         setNewServiceProvider(updatedServiceProvider);
-    }
+    };
 
     return (
         <Container maxW={"container.sm"}>
@@ -162,12 +173,9 @@ export const CreatePage = () => {
                                 </HStack>
                             </VStack>
                         </Box>
-                        <Input placeholder='Image'
-                            name='name'
-                            value={newServiceProvider.image}
-                            onChange={(e) => setNewServiceProvider({ ...newServiceProvider, image: e.target.value })}
-                            w={'full'}
-                        />
+
+                        <PictureUploader serviceProvider={newServiceProvider} setImage={setSelectedImage} />
+
                         <Button colorScheme='blue' onClick={handleAddServiceProvider} w='full'>
                             Add
                         </Button>
@@ -176,5 +184,4 @@ export const CreatePage = () => {
             </VStack>
         </Container >
     )
-
 };

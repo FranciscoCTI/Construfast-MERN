@@ -100,6 +100,10 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
         onClose();
     };
 
+    //const baseUrl = import.meta.env.REACT_APP_API_BASE_URL;
+    const baseUrl = 'http://localhost:5000'
+    const imageUrl = `${baseUrl}/${serviceProvider.image}`;
+
     return (
         <Box shadow='lg'
             rounded='lg'
@@ -108,7 +112,7 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
             _hover={{ transform: "translateY(-20px)", shadow: 'x1' }}
             bg={bg}
         >
-            <Image src={serviceProvider.image} alt={serviceProvider.name} h={48} w='full' objectFit='cover' />
+            <Image src={imageUrl} alt={serviceProvider.name} h={48} w='full' objectFit='cover' />
             <Box p={4}>
                 <Heading as='h3' size='md' mb={2}>
                     {serviceProvider.name}
