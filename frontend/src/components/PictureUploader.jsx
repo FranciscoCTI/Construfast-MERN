@@ -2,12 +2,11 @@ import { useState, useRef } from 'react';
 import { Box, Button, Flex, Image, Input, useToast } from '@chakra-ui/react';
 import originalImage from '../../../backend/uploads/anonimousUser.jpg';
 import loadingGif from '../../../backend/uploads/loading.gif'
-import { useServiceProviderStore } from '../store/serviceProvider';
 
-export const PictureUploader = ({ serviceProvider, setImage }) => {
+export const PictureUploader = ({ serviceProvider, setImage, imageUrl }) => {
     const [selectedFile, setSelectedFile] = useState(originalImage);
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [uploadedURL, setUploadedURL] = useState();
+    const [previewUrl, setPreviewUrl] = useState(imageUrl);
+
     const toast = useToast();
     const fileUploadRef = useRef();
 
@@ -34,25 +33,34 @@ export const PictureUploader = ({ serviceProvider, setImage }) => {
 
         setImage(data.filePath);
 
-        console.log(data);
+        toast({
+            title: "Image succesfully uploaded",
+            description: "If you completed all the fields you can proceed",
+            status: 'success',
+            isClosable: true
+        })
     };
 
     return (
         <Box border="1px solid" borderColor="gray.300" w={'100%'} alignContent={'center'}>
-            <Flex justify="center" align="center">
+            <Flex direction="column"
+                align="center"
+                justify="center"
+                mt={8}>
                 <Input ref={fileUploadRef}
                     type="file"
                     onChange={handleFileChange}
                     accept="image/*"
-                    align={'start'}
+                    width="auto"
+                    mb={4}
                 />
+                {previewUrl && <Image src={previewUrl} boxSize="150px" objectFit="contain" borderRadius="full" />}
+                <Button as="span" mt={2} onClick={() => handleUpload()}
+                    colorScheme="teal"
+                    justify={'center'}>
+                    Upload image
+                </Button>
             </Flex>
-            {previewUrl && <Image src={previewUrl} boxSize="150px" borderRadius="full" />}
-            <Button as="span" mt={2} onClick={() => handleUpload()}
-                colorScheme="teal"
-                justify={'center'}>
-                Upload
-            </Button>
         </Box>
     );
 };

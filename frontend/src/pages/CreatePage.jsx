@@ -10,6 +10,7 @@ import { CiTrophy } from 'react-icons/ci';
 import { cities, disciplines } from '../../../backend/models/enums';
 import ServiceProvider from '../../../backend/models/serviceProvider.model';
 import PictureUploader from '../components/PictureUploader.jsx';
+import { useNavigate } from 'react-router-dom';
 
 export const CreatePage = () => {
     const [newServiceProvider, setNewServiceProvider] = useState({
@@ -25,10 +26,19 @@ export const CreatePage = () => {
     const [selectedDiscipline, setSelectedDiscipline] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
     const [selectedImage, setSelectedImage] = useState('');
+    const navigate = useNavigate();
+
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const handleAddServiceProvider = async () => {
 
-        if (!selectedImage) {
+        if (!selectedImage || !selectedCity) {
+            toast({
+                title: "Cannot proceed",
+                description: "You have to set all fields to create a service provider profile",
+                status: "error",
+                isClosable: true
+            })
             return;
         }
 
@@ -54,6 +64,10 @@ export const CreatePage = () => {
                 isClosable: true
             })
         }
+
+        await delay(1500);
+        navigate('/');
+        await delay(1500);
 
         setNewServiceProvider({
             name: 'New service provider',
@@ -92,6 +106,9 @@ export const CreatePage = () => {
         setNewServiceProvider(updatedServiceProvider);
     };
 
+    const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
+    const imageUrl = `${baseUrl}/${'uploads/anonimousUser.jpg'}`;
+
     return (
         <Container maxW={"container.sm"}>
             <VStack spacing={8}>
@@ -114,6 +131,7 @@ export const CreatePage = () => {
                             value={newServiceProvider.phone}
                             onChange={(e) => setNewServiceProvider({ ...newServiceProvider, phone: e.target.value })}
                         />
+                        //City UI
                         <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>
                             <HStack align={'center'} spacing={5}>
                                 <Text align={'left'} ><b>City</b></Text>
@@ -133,9 +151,14 @@ export const CreatePage = () => {
                                 </HStack>
                             </HStack>
                         </Box>
+                        //Disciplines UI
                         <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>
                             <VStack align={'center'} spacing={5}>
                                 <Text align={'left'} ><b>Disciplines</b></Text>
+                                {
+                                    newServiceProvider.disciplines.length === 0 &&
+                                    (<Text>This service provider has no disciplines yet</Text>)
+                                }
                                 <Wrap mb={10}>
                                     {
                                         newServiceProvider.disciplines.map((discipline, idDic) => (
@@ -174,7 +197,7 @@ export const CreatePage = () => {
                             </VStack>
                         </Box>
 
-                        <PictureUploader serviceProvider={newServiceProvider} setImage={setSelectedImage} />
+                        <PictureUploader serviceProvider={newServiceProvider} setImage={setSelectedImage} imageUrl={imageUrl} />
 
                         <Button colorScheme='blue' onClick={handleAddServiceProvider} w='full'>
                             Add

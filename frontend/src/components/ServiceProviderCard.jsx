@@ -10,6 +10,7 @@ import {
 import { useServiceProviderStore } from '../store/serviceProvider';
 import { useState } from 'react';
 import { disciplines, cities } from '../../../backend/models/enums.js';
+import PictureUploader from './PictureUploader.jsx';
 
 export const ServiceProviderCard = ({ serviceProvider }) => {
 
@@ -21,6 +22,7 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [selectedDiscipline, setSelectedDiscipline] = useState('');
+    const [selectedImage, setSelectedImage] = useState('');
 
     const handleDeleteServiceProvider = async (id) => {
         const { success, message } = await removeServiceProvider(id)
@@ -100,8 +102,12 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
         onClose();
     };
 
-    //const baseUrl = import.meta.env.REACT_APP_API_BASE_URL;
-    const baseUrl = 'http://localhost:5000'
+    const setSelectedImageMethod = (definedImage) => {
+        setSelectedImage(definedImage);
+        setUpdatedServiceProvider({ ...updatedServiceProvider, image: definedImage })
+    };
+
+    const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
     const imageUrl = `${baseUrl}/${serviceProvider.image}`;
 
     return (
@@ -172,11 +178,10 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                                     </option>
                                 ))}
                             </Select>
-                            <Input placeholder='Image'
-                                name='name'
-                                value={updatedServiceProvider.image}
-                                onChange={e => setUpdatedServiceProvider({ ...updatedServiceProvider, image: e.target.value })}
-                            />
+
+                            <PictureUploader serviceProvider={updatedServiceProvider} setImage={setSelectedImageMethod} imageUrl={imageUrl} />
+
+                            //Disciplines UI
                             {updatedServiceProvider?.disciplines?.length > 0 ? (
                                 <Wrap>
                                     {
