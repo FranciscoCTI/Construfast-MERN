@@ -25,7 +25,7 @@ export const NavBar = () => {
                     fontWeight={"bold"}
                     textTransform={"uppercase"}
                     textAlign={"center"}
-                    bgGradient={"linear(to-r, cyan.400, blue.500)"}
+                    bgGradient={"linear(to-r, Black, blue)"}
                     bgClip={'text'}
                 >
                     <Link to={"/"}>ConstruFast</Link>
