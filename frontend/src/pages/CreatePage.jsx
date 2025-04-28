@@ -22,6 +22,8 @@ export const CreatePage = () => {
         image: '',
         city: '',
         phone: '',
+        lat: -1,
+        lng: -1,
         disciplines: []
     });
 
@@ -49,7 +51,7 @@ export const CreatePage = () => {
             return;
         }
 
-        const updatedServiceProvider = { ...newServiceProvider, image: selectedImage };
+        const updatedServiceProvider = { ...newServiceProvider, image: selectedImage, lat: latitude, lng: longitude };
 
         setNewServiceProvider(updatedServiceProvider);
 
@@ -195,7 +197,9 @@ export const CreatePage = () => {
                                 onChange={(e) => setLongitude(e.target.value)}
                             />
                             {latitude == '' && <Box textAlign={"center"} mt={5} mb={3}><b>Select a location on the map</b></Box>}
-                            <SetLocationMap mapClickHandler={handleMapClick} dragEndHandler={handleDragEnd} />
+                            <SetLocationMap mapClickHandler={handleMapClick}
+                                dragEndHandler={handleDragEnd}
+                                height='300px' initialMarker={null} />
                         </Box>
                         //Disciplines UI
                         <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>

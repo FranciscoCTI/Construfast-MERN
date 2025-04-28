@@ -26,7 +26,6 @@ const severalMarkers = [
     { lat: -33.438267, lng: -70.6592950, message: 'Felipe Contreras Chavez' }
 ]
 
-
 const MapWithStyle = () => {
     const mapRef = useRef(null);
 

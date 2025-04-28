@@ -18,7 +18,7 @@ export const getServiceProviders = async (req, res) => {
 export const createServiceProvider = async (req, res) => {
     const sp = req.body;
 
-    if (!sp.name || !sp.image || !sp.city || !sp.disciplines || !sp.phone) {
+    if (!sp.name || !sp.image || !sp.city || !sp.disciplines || !sp.phone || !sp.lat || !sp.lng) {
         return res.status(400).json({ success: false, message: "Please provide all fields" });
     }
 

@@ -11,6 +11,7 @@ import { useServiceProviderStore } from '../store/serviceProvider';
 import { useState } from 'react';
 import { disciplines, cities } from '../../../backend/models/enums.js';
 import PictureUploader from './PictureUploader.jsx';
+import SetLocationMap from '../components/SetLocationMap.jsx';
 
 export const ServiceProviderCard = ({ serviceProvider }) => {
 
@@ -23,6 +24,9 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
 
     const [selectedDiscipline, setSelectedDiscipline] = useState('');
     const [selectedImage, setSelectedImage] = useState('');
+
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
 
     const handleDeleteServiceProvider = async (id) => {
         const { success, message } = await removeServiceProvider(id)
@@ -47,6 +51,7 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
     }
 
     const handleUpdateServiceProvider = async (pid, updatedServiceProvider) => {
+
         const { success, message } = await editServiceProvider(pid, updatedServiceProvider);
         onClose();
         if (!success) {
@@ -107,6 +112,38 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
         setUpdatedServiceProvider({ ...updatedServiceProvider, image: definedImage })
     };
 
+    const handleMapClick = (event) => {
+        const { latLng } = event;
+        const latitude = latLng.lat();
+        const longitude = latLng.lng();
+
+        console.log('Clicked at:', latitude, longitude);
+
+        setLatitude(latitude);
+        setLongitude(longitude);
+
+        const updated = { ...updatedServiceProvider, lat: latitude, lng: longitude };
+
+        setUpdatedServiceProvider(updated);
+
+    };
+
+    const handleDragEnd = (event) => {
+        const { latLng } = event;
+        const latitude = latLng.lat();
+        const longitude = latLng.lng();
+
+        console.log('Clicked at:', latitude, longitude);
+
+        setLatitude(latitude);
+        setLongitude(longitude);
+
+        const updated = { ...updatedServiceProvider, lat: latitude, lng: longitude };
+
+        setUpdatedServiceProvider(updated);
+
+    };
+
     const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
     const imageUrl = `${baseUrl}/${serviceProvider.image}`;
 
@@ -151,7 +188,7 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
 
             <Modal isOpen={isOpen} onClose={handleModalClose}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent maxW={600}>
                     <ModalHeader>Update service provider</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
@@ -167,6 +204,7 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                                 value={updatedServiceProvider.phone}
                                 onChange={e => setUpdatedServiceProvider({ ...updatedServiceProvider, phone: e.target.value })}
                             />
+
                             <Select
                                 placeholder="Select city"
                                 value={updatedServiceProvider.city}
@@ -178,8 +216,23 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                                     </option>
                                 ))}
                             </Select>
+                            <pre hidden>{JSON.stringify(updatedServiceProvider, null, 2)}</pre>
+                            <Input placeholder='Latitude'
+                                type='number'
+                                value={updatedServiceProvider.lat}
+                            />
+                            <Input placeholder='Longitude'
+                                type='number'
+                                value={updatedServiceProvider.lng}
+                            />
+                            <SetLocationMap mapClickHandler={handleMapClick}
+                                dragEndHandler={handleDragEnd}
+                                height={'250px'}
+                                initialMarker={{ lat: serviceProvider.lat, lng: serviceProvider.lng }} />
 
-                            <PictureUploader serviceProvider={updatedServiceProvider} setImage={setSelectedImageMethod} imageUrl={imageUrl} />
+                            <PictureUploader serviceProvider={updatedServiceProvider}
+                                setImage={setSelectedImageMethod}
+                                imageUrl={imageUrl} />
 
                             //Disciplines UI
                             {updatedServiceProvider?.disciplines?.length > 0 ? (

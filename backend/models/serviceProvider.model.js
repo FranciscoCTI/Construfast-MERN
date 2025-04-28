@@ -20,7 +20,15 @@ const serviceProviderSchema = new mongoose.Schema({
     disciplines: {
         type: [String],
         required: true
-    }
+    },
+    lat: {
+        type: Number,
+        required: true
+    },
+    lng: {
+        type: Number,
+        required: true
+    },
 },
     {
         timestamps: true // creates the CreatedAt and UpdatedAt values for each instance
