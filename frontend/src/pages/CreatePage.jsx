@@ -3,7 +3,8 @@ import {
     Box, Button, Container,
     Heading, useColorModeValue, VStack,
     Input, HStack, Stack,
-    useToast, Select, Wrap, Text
+    useToast, Select, Wrap, Text,
+    Center
 } from '@chakra-ui/react';
 import { useServiceProviderStore } from '../store/serviceProvider';
 import { CiTrophy } from 'react-icons/ci';
@@ -11,6 +12,9 @@ import { cities, disciplines } from '../../../backend/models/enums';
 import ServiceProvider from '../../../backend/models/serviceProvider.model';
 import PictureUploader from '../components/PictureUploader.jsx';
 import { useNavigate } from 'react-router-dom';
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { RegularMapStyle } from '../MapStyles.js'
+import SetLocationMap from '../components/SetLocationMap.jsx';
 
 export const CreatePage = () => {
     const [newServiceProvider, setNewServiceProvider] = useState({
@@ -27,6 +31,9 @@ export const CreatePage = () => {
     const [selectedCity, setSelectedCity] = useState('');
     const [selectedImage, setSelectedImage] = useState('');
     const navigate = useNavigate();
+
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
 
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -109,6 +116,28 @@ export const CreatePage = () => {
     const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
     const imageUrl = `${baseUrl}/${'uploads/anonimousUser.jpg'}`;
 
+    const handleMapClick = (event) => {
+        const { latLng } = event;
+        const latitude = latLng.lat();
+        const longitude = latLng.lng();
+
+        console.log('Clicked at:', latitude, longitude);
+
+        setLatitude(latitude);
+        setLongitude(longitude);
+    };
+
+    const handleDragEnd = (event) => {
+        const { latLng } = event;
+        const latitude = latLng.lat();
+        const longitude = latLng.lng();
+
+        console.log('Clicked at:', latitude, longitude);
+
+        setLatitude(latitude);
+        setLongitude(longitude);
+    };
+
     return (
         <Container maxW={"container.sm"}>
             <VStack spacing={8}>
@@ -150,6 +179,23 @@ export const CreatePage = () => {
                                     </Select>
                                 </HStack>
                             </HStack>
+                        </Box>
+                        //Map UI
+                        <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>
+                            <Input
+                                type='text'
+                                placeholder="Latitude"
+                                value={latitude} readOnly
+                                onChange={(e) => setLatitude(e.target.value)}
+                            />
+                            <Input
+                                type='text'
+                                placeholder="Longitude"
+                                value={longitude} readOnly
+                                onChange={(e) => setLongitude(e.target.value)}
+                            />
+                            {latitude == '' && <Box textAlign={"center"} mt={5} mb={3}><b>Select a location on the map</b></Box>}
+                            <SetLocationMap mapClickHandler={handleMapClick} dragEndHandler={handleDragEnd} />
                         </Box>
                         //Disciplines UI
                         <Box w='100%' border="1px solid" borderColor="gray.300" borderRadius="md" p={2} mb={4}>
@@ -203,8 +249,8 @@ export const CreatePage = () => {
                             Add
                         </Button>
                     </VStack>
-                </Box>
-            </VStack>
+                </Box >
+            </VStack >
         </Container >
     )
 };
