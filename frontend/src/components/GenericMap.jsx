@@ -1,11 +1,14 @@
 import { GoogleMap, LoadScript, useJsApiLoader } from "@react-google-maps/api";
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { RegularMapStyle } from '../MapStyles.js'
 import dotIcon from '../../../uploads/dot.svg'
+import { Box } from "@chakra-ui/react";
+import MarkerInfo from "./MarkerInfo.jsx";
+import ReactDOMServer from 'react-dom/server';
 
 const containerStyle = {
     width: '100%',
-    height: '500px',
+    height: '400px',
 };
 
 const center = {
@@ -13,30 +16,65 @@ const center = {
     lng: -73.066,
 };
 
-const markerHouse = {
-    lat: -36.79084814,
-    lng: -73.05656460,
-};
-
-const severalMarkers = [
-    { lat: -36.79084814, lng: -73.05656460, message: 'Familia Contreras Ortega' },
-    { lat: -36.82490, lng: -73.019085, message: 'Familia Contreras Chavez' },
-    { lat: -36.794150, lng: -73.0537552, message: 'Familia Cartes Ortega' },
-    { lat: -36.72243331, lng: -73.11611534, message: 'Familia Ortega Aravena' },
-    { lat: -33.438267, lng: -70.6592950, message: 'Felipe Contreras Chavez' }
-]
-
-const MapWithStyle = () => {
+const MapWithStyle = ({ providers, onVisibleProvidersChange }) => {
     const mapRef = useRef(null);
+
+    const infoWinRef = useRef(null);
 
     const { isLoaded } = useJsApiLoader({
         googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     });
 
+    const markersRef = useRef([]);
+
+    function clearMarkers() {
+        markersRef.current.forEach(marker => marker.setMap(null));
+        markersRef.current = [];
+    }
+
+    useEffect(() => {
+        if (mapRef.current && providers.length > 0) {
+            clearMarkers();
+            providers.forEach(provider => {
+                const newMark = new window.google.maps.Marker({
+                    position: { lat: provider.lat, lng: provider.lng },
+                    map: mapRef.current,
+                    title: provider.name,
+                    icon: {
+                        url: dotIcon,
+                        scaledSize: new window.google.maps.Size(10, 10)
+                    }
+                });
+
+                newMark.setMap(mapRef.current);
+
+                markersRef.current.push(newMark);
+
+                const infoContent = ReactDOMServer.renderToString(<MarkerInfo provider={provider} />);
+
+                const infoWindow = new window.google.maps.InfoWindow({
+                    content: infoContent
+                });
+
+                newMark.addListener('click', () => {
+
+                    if (infoWinRef.current) {
+                        infoWinRef.current.close();
+                    }
+
+                    infoWindow.open(mapRef.current, newMark);
+                    infoWinRef.current = infoWindow;
+                });
+
+            });
+        }
+    }, [providers]);
+
     return isLoaded ? (
         <div
             style={containerStyle}
-            ref={(el) => {
+            ref=
+            {(el) => {
                 if (el && !mapRef.current) {
                     mapRef.current = new window.google.maps.Map(el, {
                         center,
@@ -48,28 +86,35 @@ const MapWithStyle = () => {
                         streetViewControl: false
                     });
 
-                    severalMarkers.forEach(m => {
-                        const marker = new window.google.maps.Marker({
-                            position: { lat: m.lat, lng: m.lng },
-                            map: mapRef.current,
-                            title: m.message,
-                            icon: {
-                                url: dotIcon,
-                                scaledSize: new window.google.maps.Size(20, 20)
-                            }
-                        });
+                    mapRef.current.addListener('idle', () => {
+                        const bounds = mapRef.current.getBounds();
+                        if (bounds) {
+                            const visibleProviders = providers.filter((provider) => {
+                                const position = new window.google.maps.LatLng(provider.lat, provider.lng);
+                                return bounds.contains(position);
+                            });
+                            onVisibleProvidersChange(visibleProviders);
+                        }
+                    });
 
-                        const popup = new window.google.maps.InfoWindow();
-
-                        window.google.maps.event.addListener(marker, 'click', (function (marker) {
-                            return function () {
-                                popup.setContent(m.message)
-                                popup.open(mapRef.current, marker)
-                            }
-                        })(marker)
-                        )
-                        marker.setMap(mapRef.current);
-                    })
+                    /*
+                    //This recognize the location of the user and start the map there. Turn off for production
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+    
+                            mapRef.current.setCenter(userLocation);
+                            mapRef.current.setZoom(14);
+                        },
+                        (error) => {
+                            console.error('There´s a problem getting the location', error);
+                        }
+    
+                    );
+                    */
                 }
             }}
         />

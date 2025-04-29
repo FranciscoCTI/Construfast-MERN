@@ -187,13 +187,15 @@ export const CreatePage = () => {
                             <Input
                                 type='text'
                                 placeholder="Latitude"
-                                value={latitude} readOnly
+                                value={latitude}
+                                readOnly hidden
                                 onChange={(e) => setLatitude(e.target.value)}
                             />
                             <Input
                                 type='text'
                                 placeholder="Longitude"
-                                value={longitude} readOnly
+                                value={longitude}
+                                readOnly hidden
                                 onChange={(e) => setLongitude(e.target.value)}
                             />
                             {latitude == '' && <Box textAlign={"center"} mt={5} mb={3}><b>Select a location on the map</b></Box>}

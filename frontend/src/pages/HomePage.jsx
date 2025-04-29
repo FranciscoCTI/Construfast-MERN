@@ -1,6 +1,6 @@
 import { VStack, Container, Text, SimpleGrid } from '@chakra-ui/react'
 import { Box } from '@chakra-ui/react';
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useServiceProviderStore } from '../store/serviceProvider'
 import ServiceProviderCard from '../components/ServiceProviderCard'
@@ -11,6 +11,8 @@ export const HomePage = () => {
     const { fetchServiceProviders, serviceProviders, selectedDiscipline, selectedCity } = useServiceProviderStore();
 
     useEffect(() => { fetchServiceProviders() }, [fetchServiceProviders]);
+
+    const [visibleProviders, setVisibleProviders] = useState([]);
 
     console.log('Service providers:', serviceProviders);
 
@@ -28,7 +30,8 @@ export const HomePage = () => {
 
     return (
         <>
-            <GenericMap />
+            <GenericMap providers={filteredProviders}
+                onVisibleProvidersChange={(newVisibleProviders) => setVisibleProviders(newVisibleProviders)} />
             <Container maxW='container.xl' py={6}>
                 <VStack spacing={6}>
                     <Text
@@ -38,22 +41,22 @@ export const HomePage = () => {
                         bgClip={'text'}
                         textAlign={'center'}
                     >
-                        Check out the current service providers in your area ▼
+                        Find an available service provider in your area ▼
                     </Text>
 
-                    <Box>
+                    <Box hidden>
                         <FilterBar />
                     </Box>
                     <SimpleGrid
                         columns={{
                             base: 1,
-                            md: 2,
-                            lg: 3
+                            md: 1,
+                            lg: 7
                         }}
-                        spacing={10}
+                        spacing={4}
                         w={'full'}
                     >
-                        {filteredProviders.map((sp) => (
+                        {visibleProviders.map((sp) => (
 
                             (sp != null && sp.name != "" && sp.phone != 0 && sp.image != "") &&
                             (<ServiceProviderCard key={sp._id} serviceProvider={sp} />)
@@ -61,7 +64,7 @@ export const HomePage = () => {
                     </SimpleGrid>
 
                     {
-                        filteredProviders.length === 0 &&
+                        visibleProviders.length === 0 &&
                         (
                             <Text fontSize='x1' textAlign={'center'} fontWeight={'bold'} color='gray.500'>
                                 No service providers found :( {''}

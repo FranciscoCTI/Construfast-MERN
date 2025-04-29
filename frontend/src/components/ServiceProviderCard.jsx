@@ -155,32 +155,32 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
             _hover={{ transform: "translateY(-20px)", shadow: 'x1' }}
             bg={bg}
         >
-            <Image src={imageUrl} alt={serviceProvider.name} h={48} w='full' objectFit='cover' />
-            <Box p={4}>
-                <Heading as='h3' size='md' mb={2}>
+            <Image src={imageUrl} alt={serviceProvider.name} h={60} w='full' objectFit='cover' />
+            <Box p={1}>
+                <Heading as='h3' size='s' mb={2}>
                     {serviceProvider.name}
                 </Heading>
 
                 <VStack align={'start'}>
                     <HStack textAlign='left'>
-                        <Text textAlign='left' fontWeight='bold' fontSize='s' color={textColor} mb={0}>
+                        <Text textAlign='left' fontWeight='bold' fontSize='xs' color={textColor} mb={0}>
                             Phone:
                         </Text>
-                        <Text fontSize='s' color={textColor} mb={0}>
+                        <Text fontSize='xs' color={textColor} mb={0}>
                             {serviceProvider.phone}
                         </Text>
                     </HStack>
                     <HStack textAlign='left'>
-                        <Text textAlign='left' fontWeight='bold' fontSize='s' color={textColor} mb={0}>
+                        <Text textAlign='left' fontWeight='bold' fontSize='xs' color={textColor} mb={0}>
                             City:
                         </Text>
-                        <Text fontSize='s' color={textColor} mb={0}>
+                        <Text fontSize='xs' color={textColor} mb={0}>
                             {serviceProvider.city}
                         </Text>
                     </HStack>
                 </VStack>
 
-                <HStack spacing={2} mt={5}>
+                <HStack spacing={1} mt={3}>
                     <IconButton icon={<EditIcon />} onClick={handleModalOpen} colorScheme='blue' />
                     <IconButton icon={<DeleteIcon />} onClick={() => handleDeleteServiceProvider(serviceProvider._id)} colorScheme='red' />
                 </HStack>
@@ -220,10 +220,12 @@ export const ServiceProviderCard = ({ serviceProvider }) => {
                             <Input placeholder='Latitude'
                                 type='number'
                                 value={updatedServiceProvider.lat}
+                                hidden
                             />
                             <Input placeholder='Longitude'
                                 type='number'
                                 value={updatedServiceProvider.lng}
+                                hidden
                             />
                             <SetLocationMap mapClickHandler={handleMapClick}
                                 dragEndHandler={handleDragEnd}
